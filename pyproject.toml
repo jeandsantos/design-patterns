@@ -61,4 +61,3 @@ markers = [
     "integration: marks integration tests (deselect with '-m \"not integration\"')",
     "smoke: quick test of major parts",
 ]
-
