@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.dagster]
+module_name = "design_patterns"
+
+[tool.ruff]
+
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # Pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "N",    # pep8-naming
+    "D",    # pydocstyle
+    "UP",   # pyupgrade
+    "PL",   # pylint
+    "C",    # convention
+    "R",    # refactor
+    "RUF",  # ruff
+    "PERF", # performance
+
+]
+ignore = [
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public nested class
+    "D102", # Missing docstring in public class
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D106", # Missing docstring in public nested module
+    "D107", # Missing docstring in __init__
+    "D401", # First line should be in imperative mood
+]
+
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-ra"
+]
+testpaths = "tests"
+
+pythonpath = "design_patterns"
+
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "bugs: tests that reproduce issues",
+    "integration: marks integration tests (deselect with '-m \"not integration\"')",
+    "smoke: quick test of major parts",
+]
+

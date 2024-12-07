@@ -1,0 +1,5 @@
+isort
+pre-commit
+pre-commit-hooks
+pytest
+ruff
