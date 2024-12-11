@@ -1,0 +1,10 @@
+Tokyo
+32
+New York
+17
+Sao Paulo
+17
+Seoul
+17
+Manila
+14
