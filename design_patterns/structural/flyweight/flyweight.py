@@ -44,24 +44,26 @@ def main():
     first_names = [random_first_name() for _ in range(n_users)]
     last_names = [random_last_name() for _ in range(n_users)]
 
+    print("user", "\t" * 2, "user.names", "\t", "user.strings")
     for first_name, last_name in zip(first_names, last_names):
         user = UserOptimized(f"{first_name} {last_name}")
-        print(user, "\t", user.names)
+        print(user, "\t", user.names, "\t", user.strings)
         users.append(user)
 
 
 if __name__ == "__main__":
     main()
     # output:
-    # Alice Doe        [0, 1]
-    # Alice Smith      [0, 2]
-    # Diana Khan       [3, 4]
-    # Bob Doe          [5, 1]
-    # Alice Khan       [0, 4]
-    # Alice Smith      [0, 2]
-    # Bob Smith        [5, 2]
-    # Alice Khan       [0, 4]
-    # Bob Wilson       [5, 6]
-    # Charlie Smith    [7, 2]
-    # Charlie Khan     [7, 4]
-    # Bob Wilson       [5, 6]
+    # user             user.names      user.strings
+    # Alice Doe        [0, 1]          ['Alice', 'Doe']
+    # Alice Smith      [0, 2]          ['Alice', 'Doe', 'Smith']
+    # Diana Khan       [3, 4]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan']
+    # Bob Doe          [5, 1]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan', 'Bob']
+    # Alice Khan       [0, 4]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan', 'Bob']
+    # Alice Smith      [0, 2]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan', 'Bob']
+    # Bob Smith        [5, 2]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan', 'Bob']
+    # Alice Khan       [0, 4]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan', 'Bob']
+    # Bob Wilson       [5, 6]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan', 'Bob', 'Wilson']
+    # Charlie Smith    [7, 2]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan', 'Bob', 'Wilson', 'Charlie']
+    # Charlie Khan     [7, 4]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan', 'Bob', 'Wilson', 'Charlie']
+    # Bob Wilson       [5, 6]          ['Alice', 'Doe', 'Smith', 'Diana', 'Khan', 'Bob', 'Wilson', 'Charlie']
