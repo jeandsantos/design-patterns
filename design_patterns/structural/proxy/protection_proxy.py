@@ -1,3 +1,5 @@
+"""Protection proxy."""
+
 MINIMUM_DRIVING_AGE: int = 18
 
 
