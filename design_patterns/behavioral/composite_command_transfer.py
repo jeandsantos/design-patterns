@@ -1,14 +1,8 @@
 """Bank account with command pattern."""
 
 from abc import ABC, abstractmethod
-from enum import Enum, auto
 
 OVERDRAFT_LIMIT: int = -500
-
-
-class Actions(Enum):
-    DEPOSIT = auto()
-    WITHDRAW = auto()
 
 
 class BankAccount:
@@ -41,32 +35,36 @@ class Command(ABC):
     def undo(self): ...
 
 
-class BankAccountCommand(Command):
-    def __init__(self, account: BankAccount, action: Actions, amount: int):
+class WithdrawCommand(Command):
+    def __init__(self, account: BankAccount, amount: int):
         self.account = account
-        self.action = action
         self.amount = amount
         self.success: bool | None = None
 
     def invoke(self):
-        if self.action == Actions.DEPOSIT:
-            self.account.deposit(self.amount)
-            self.success = True
-        elif self.action == Actions.WITHDRAW:
-            self.success = self.account.withdraw(self.amount)
-        else:
-            raise ValueError(f"Unknown action: {self.action}")
+        self.success = self.account.withdraw(self.amount)
 
     def undo(self):
         if not self.success:
             return
 
-        if self.action == Actions.DEPOSIT:
-            self.account.withdraw(self.amount)
-        elif self.action == Actions.WITHDRAW:
-            self.account.deposit(self.amount)
-        else:
-            raise ValueError(f"Unknown action: {self.action}")
+        self.account.deposit(self.amount)
+
+
+class DepositCommand(Command):
+    def __init__(self, account: BankAccount, amount: int):
+        self.account = account
+        self.amount = amount
+        self.success: bool | None = None
+
+    def invoke(self):
+        self.account.deposit(self.amount)
+        self.success = True
+
+    def undo(self):
+        if not self.success:
+            return
+        self.account.withdraw(self.amount)
 
 
 class CompositeBankAccountCommand(Command, list):
@@ -87,8 +85,8 @@ class TransferCommand(CompositeBankAccountCommand):
     def __init__(self, from_account: BankAccount, to_account: BankAccount, amount: int):
         super().__init__(
             [
-                BankAccountCommand(from_account, Actions.WITHDRAW, amount),
-                BankAccountCommand(to_account, Actions.DEPOSIT, amount),
+                WithdrawCommand(from_account, amount),
+                DepositCommand(to_account, amount),
             ],
         )
 
@@ -132,3 +130,39 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # output:
+    # Transfer amount: 80
+
+    # bank_account_1 Balance: 100
+    # bank_account_2 Balance: 0
+
+    # Invoke
+    # Withdrew 80. Current balance: 20
+    # Deposited 80. Current balance: 80
+    # bank_account_1 Balance: 20
+    # bank_account_2 Balance: 80
+    # Command success:  True
+
+    # Undo
+    # Withdrew 80. Current balance: 0
+    # Deposited 80. Current balance: 100
+    # bank_account_1 Balance: 100
+    # bank_account_2 Balance: 0
+    # Command success:  True
+    # --------------------------------------------------
+    # Transfer amount: 1000
+
+    # bank_account_1 Balance: 100
+    # bank_account_2 Balance: 0
+
+    # Invoke
+    # Insufficient funds
+    # bank_account_1 Balance: 100
+    # bank_account_2 Balance: 0
+    # Command success:  False
+
+    # Undo
+    # bank_account_1 Balance: 100
+    # bank_account_2 Balance: 0
+    # Command success:  False
+    # --------------------------------------------------

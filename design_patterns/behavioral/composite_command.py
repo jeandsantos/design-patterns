@@ -1,14 +1,8 @@
 """Bank account with command pattern."""
 
 from abc import ABC, abstractmethod
-from enum import Enum, auto
 
 OVERDRAFT_LIMIT: int = -500
-
-
-class Actions(Enum):
-    DEPOSIT = auto()
-    WITHDRAW = auto()
 
 
 class BankAccount:
@@ -38,32 +32,36 @@ class Command(ABC):
     def undo(self): ...
 
 
-class BankAccountCommand(Command):
-    def __init__(self, account: BankAccount, action: Actions, amount: int):
+class WithdrawCommand(Command):
+    def __init__(self, account: BankAccount, amount: int):
         self.account = account
-        self.action = action
         self.amount = amount
         self.success: bool | None = None
 
     def invoke(self):
-        if self.action == Actions.DEPOSIT:
-            self.account.deposit(self.amount)
-            self.success = True
-        elif self.action == Actions.WITHDRAW:
-            self.success = self.account.withdraw(self.amount)
-        else:
-            raise ValueError(f"Unknown action: {self.action}")
+        self.success = self.account.withdraw(self.amount)
 
     def undo(self):
         if not self.success:
             return
 
-        if self.action == Actions.DEPOSIT:
-            self.account.withdraw(self.amount)
-        elif self.action == Actions.WITHDRAW:
-            self.account.deposit(self.amount)
-        else:
-            raise ValueError(f"Unknown action: {self.action}")
+        self.account.deposit(self.amount)
+
+
+class DepositCommand(Command):
+    def __init__(self, account: BankAccount, amount: int):
+        self.account = account
+        self.amount = amount
+        self.success: bool | None = None
+
+    def invoke(self):
+        self.account.deposit(self.amount)
+        self.success = True
+
+    def undo(self):
+        if not self.success:
+            return
+        self.account.withdraw(self.amount)
 
 
 class CompositeBankAccountCommand(Command, list):
@@ -84,11 +82,12 @@ def main():
     bank_account = BankAccount()
     print(bank_account, "\n")
 
-    deposit_command_1 = BankAccountCommand(bank_account, Actions.DEPOSIT, 1000)
-    deposit_command_2 = BankAccountCommand(bank_account, Actions.DEPOSIT, 500)
+    deposit_command_1 = DepositCommand(bank_account, 1000)
+    deposit_command_2 = DepositCommand(bank_account, 500)
+    withdraw_command = WithdrawCommand(bank_account, 100)
 
     print("Invoke")
-    composite_command = CompositeBankAccountCommand([deposit_command_1, deposit_command_2])
+    composite_command = CompositeBankAccountCommand([deposit_command_1, deposit_command_2, withdraw_command])
     composite_command.invoke()
     print(bank_account, "\n")
 
@@ -99,3 +98,17 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # output:
+    # Balance: 0
+    #
+    # Invoke
+    # Deposited 1000. Current balance: 1000
+    # Deposited 500. Current balance: 1500
+    # Withdrew 100. Current balance: 1400
+    # Balance: 1400
+    #
+    # Undo
+    # Deposited 100. Current balance: 1500
+    # Withdrew 500. Current balance: 1000
+    # Withdrew 1000. Current balance: 0
+    # Balance: 0
